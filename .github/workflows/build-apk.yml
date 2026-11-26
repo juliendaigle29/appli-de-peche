@@ -1,4 +1,4 @@
-# Compile l'APK de l'Appli de pêche, sans rien installer sur l'ordinateur.
+# Compile l'APK de Carnet de pêche Québec, sans rien installer sur l'ordinateur.
 # Comment ça marche : on dépose le projet sur GitHub, GitHub compile tout seul,
 # et l'APK apparaît en téléchargement dans l'onglet Actions.
 name: Construire l'APK
@@ -52,7 +52,7 @@ jobs:
       - name: Récupérer l'APK
         uses: actions/upload-artifact@v4
         with:
-          name: Appli-de-peche
+          name: Carnet-de-peche-Quebec
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
 
@@ -60,6 +60,6 @@ jobs:
       - name: Publier l'APK en téléchargement public
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0-${{ github.run_number }}
-          name: Appli de pêche v1.0 (compilation ${{ github.run_number }})
+          tag_name: v1.1-${{ github.run_number }}
+          name: Carnet de pêche Québec v1.1 (compilation ${{ github.run_number }})
           files: android/app/build/outputs/apk/debug/app-debug.apk

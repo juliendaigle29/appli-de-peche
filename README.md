@@ -1,4 +1,4 @@
-# Appli de pêche — projet Android (Capacitor)
+# Carnet de pêche Québec — projet Android (Capacitor)
 
 Vraie application Android de l'appli de pêche de Julien, prête à compiler.
 L'application web (carte des plans d'eau du Québec, boîte à leurres, prises,
@@ -6,9 +6,9 @@ mode sortie, statistiques, guide d'identification hors ligne) est embarquée
 dans l'appli : elle fonctionne **hors ligne** et les données restent
 sauvegardées **sur le téléphone**.
 
-- **Nom de l'appli :** Appli de pêche
+- **Nom de l'appli :** Carnet de pêche Québec
 - **ID d'application :** `com.julien.applidepeche`
-- **Version de l'appli web :** 9 (25 novembre 2026) — voir « Mise à jour v9 » plus bas
+- **Version de l'appli web :** 10 (25 novembre 2026) — voir « Mise à jour v10 » plus bas
 - **Version Android :** 1.0 (versionCode 1)
 - **Icône :** coffre à pêche vert (déjà générée dans toutes les tailles)
 - **Permissions demandées au premier lancement :** appareil photo, images,
@@ -18,28 +18,35 @@ sauvegardées **sur le téléphone**.
 
 | Dossier / fichier | Rôle |
 |---|---|
-| `www/` | Le code web de l'appli, version 9 (`index.html` + dossier `assets/` : `guides.js`, `sw.js` cache `peche-v9`, `manifest.webmanifest`, icônes, `fonts/`, `vendor/leaflet/`, `assets/knots/` avec les 96 photos des nœuds, `version.json`) |
+| `www/` | Le code web de l'appli, version 10 (`index.html` + dossier `assets/` : `guides.js`, `sw.js` cache `peche-v10`, `manifest.webmanifest`, icônes, `fonts/`, `vendor/leaflet/`, `assets/knots/` avec les schémas des nœuds, `version.json`) |
 | `android/` | Le projet Android natif (à ouvrir dans Android Studio) |
 | `capacitor.config.json` | Nom, ID et dossier web de l'appli |
 | `android/app/src/main/assets/public/` | Copie synchronisée de `www/` dans l'appli Android |
 
-## Mise à jour v9 (version actuelle)
+## Mise à jour v10 (version actuelle)
 
-- **Photos de vraie corde pour les nœuds** : les 96 étapes des 21 nœuds sont
-  illustrées par des images de corde tressée réaliste (rendus façon photo),
+- **Vrais schémas de corde** (dessinés, pas des photos) pour 5 nœuds courants : clinch amélioré, Uni, Trilene, Albright et nail knot. Fil principal en bleu, bout libre en orange, flèches et légendes. Les autres nœuds gardent leurs étapes écrites : un schéma faux serait pire que pas de schéma.
+- **Bouton vidéo** sur chaque nœud (recherche YouTube, internet requis). Les anciennes images du v9 ont été retirées.
+
+## Mise à jour v9
+
+- **Schémas de corde pour les nœuds** : les 96 étapes des 21 nœuds sont
+  illustrées par un schéma de corde (ce ne sont pas de vraies photos),
   une par étape, dans `www/assets/knots/` — intégrées à l'appli, donc
   consultables hors ligne. Elles remplacent les anciens schémas dessinés.
 - **Onglet Guides dans la barre du bas** : les Guides (Nœuds de pêche,
   Manger le poisson, Permis de bateau) ont leur propre onglet « Guides »
   dans la barre de navigation du bas, avec Accueil, Carte, Prises, Leurres
   et Stats. La section Guides ne se trouve plus sur la page d'accueil.
-- **Cache `peche-v9`** : le service worker passe en version `peche-v9`
+- **Cache `peche-v10`** : le service worker passe en version `peche-v10`
   (réseau d'abord) et `version.json` affiche la version 9, pour que le
   téléphone charge bien les nouvelles images au lieu de l'ancienne copie.
 - **Compilation : comme avant** — rien ne change de ce côté. Soit avec
   GitHub Actions (voir `COMPILER-SANS-ANDROID-STUDIO.md` et
   `.github/workflows/build-apk.yml`, le plus simple), soit en ouvrant le
   dossier `android/` dans Android Studio (voir la section ci-dessous).
+
+- **Vidéo** : chaque nœud a un bouton « Regarder une vidéo » qui ouvre une recherche YouTube (internet requis).
 
 ## Compiler l'APK (sur un ordinateur avec Android Studio)
 
@@ -84,7 +91,7 @@ cd android
    puis activer pour l'appli utilisée pour ouvrir le fichier
    (Chrome, Mes fichiers, Gmail…).
 3. **Ouvrir le fichier APK** et toucher `Installer`.
-4. L'icône **coffre à pêche** « Appli de pêche » apparaît sur l'écran d'accueil.
+4. L'icône **coffre à pêche** « Carnet de pêche Québec » apparaît sur l'écran d'accueil.
 
 ## Après l'installation
 

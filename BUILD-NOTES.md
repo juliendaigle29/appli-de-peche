@@ -2,7 +2,7 @@
 > Java 21, Node 22, `npm install` + `npx cap sync android`). Les remarques ci-dessous concernent l'ancien
 > environnement Muse et sont gardées à titre d'historique.
 
-# Notes de compilation — Appli de pêche Android
+# Notes de compilation — Carnet de pêche Québec Android
 
 ## État
 
@@ -14,7 +14,7 @@ Il suffit de compiler le projet dans Android Studio sur un ordinateur normal
 ## Ce qui est terminé
 
 - Projet Capacitor 8.6.2 complet : `~/workspace/appli-peche-android/`
-  (`com.julien.applidepeche`, « Appli de pêche », version 1.0).
+  (`com.julien.applidepeche`, « Carnet de pêche Québec », version 1.0).
 - Dossier web `www/` synchronisé (index.html, Leaflet 1.9.4 local, service
   worker, manifeste, icônes coffre à pêche).
 - Plateforme Android ajoutée, `cap sync` fait, icônes/splash générés

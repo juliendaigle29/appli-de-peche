@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 300" width="840" height="600">
+<defs><marker id="ah" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#f4f7f5"/></marker></defs>
+<rect width="420" height="300" fill="#2c3633"/>
+<path d="M190.0,-5.0 C190.0,15.8 190.0,81.7 190.0,120.0 C190.0,158.3 188.3,203.0 190.0,225.0 C191.7,247.0 195.0,247.5 200.0,252.0 C205.0,256.5 215.0,256.5 220.0,252.0 C225.0,247.5 228.3,247.0 230.0,225.0 C231.7,203.0 230.0,137.5 230.0,120.0" fill="none" stroke="#2c3633" stroke-width="19" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M190.0,-5.0 C190.0,15.8 190.0,81.7 190.0,120.0 C190.0,158.3 188.3,203.0 190.0,225.0 C191.7,247.0 195.0,247.5 200.0,252.0 C205.0,256.5 215.0,256.5 220.0,252.0 C225.0,247.5 228.3,247.0 230.0,225.0 C231.7,203.0 230.0,137.5 230.0,120.0" fill="none" stroke="#10201c" stroke-width="14.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M190.0,-5.0 C190.0,15.8 190.0,81.7 190.0,120.0 C190.0,158.3 188.3,203.0 190.0,225.0 C191.7,247.0 195.0,247.5 200.0,252.0 C205.0,256.5 215.0,256.5 220.0,252.0 C225.0,247.5 228.3,247.0 230.0,225.0 C231.7,203.0 230.0,137.5 230.0,120.0" fill="none" stroke="#59b0ff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M190.0,-5.0 C190.0,15.8 190.0,81.7 190.0,120.0 C190.0,158.3 188.3,203.0 190.0,225.0 C191.7,247.0 195.0,247.5 200.0,252.0 C205.0,256.5 215.0,256.5 220.0,252.0 C225.0,247.5 228.3,247.0 230.0,225.0 C231.7,203.0 230.0,137.5 230.0,120.0" fill="none" stroke="#ffffff" stroke-opacity=".28" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" transform="translate(-1.2,-1.2)"/>
+<text x="270" y="130" fill="#f4f7f5" font-family="DM Sans, Arial, sans-serif" font-size="15" font-weight="700" text-anchor="start">boucle dans le</text>
+<text x="270" y="148" fill="#f4f7f5" font-family="DM Sans, Arial, sans-serif" font-size="15" font-weight="700" text-anchor="start">fil le plus gros</text>
+</svg>

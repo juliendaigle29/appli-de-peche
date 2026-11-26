@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Appli de pêche</string>
-    <string name="title_activity_main">Appli de pêche</string>
+    <string name="app_name">Carnet de pêche Québec</string>
+    <string name="title_activity_main">Carnet de pêche Québec</string>
     <string name="package_name">com.julien.applidepeche</string>
     <string name="custom_url_scheme">com.julien.applidepeche</string>
 </resources>

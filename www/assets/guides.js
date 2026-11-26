@@ -193,6 +193,9 @@ var KNOT_RIGS = {
   ]
 };
 
+/* Nœuds qui ont un schéma étape par étape (assets/knots/<id>-<n>.svg). Les autres : texte + vidéo. */
+var KNOT_FIGS = ["clinch", "uni", "trilene", "albright", "nail"];
+
 var knotState = { m: "all", l: "all", u: "all", q: "" };
 
 function knotChips(list, key) {
@@ -236,7 +239,7 @@ function renderGuides() {
       : "Ajoute la photo de ta carte de conducteur";
   }
   var nk = document.getElementById("guidesKnotCount");
-  if (nk) nk.textContent = KNOTS.length + " nœuds, étape par étape, photos de vraie corde";
+  if (nk) nk.textContent = KNOTS.length + " nœuds, étape par étape, avec vidéos";
 }
 
 function openKnots() {
@@ -250,7 +253,7 @@ function openKnots() {
     '<input class="finput" type="search" id="knotQ" placeholder="Chercher un nœud" aria-label="Chercher un nœud" style="margin-top:12px;" oninput="knotSearch(this.value)" /></div>' +
     '<div id="knotList">' + knotListHtml() + "</div>" +
     '<button class="btn btn-ghost" style="margin:6px 0 4px;" onclick="openKnotRigs()">Types de montage par méthode</button>' +
-    '<p class="small muted" style="margin:10px 2px;">Ouvre un nœud : chaque étape est montrée en photo, avec de la vraie corde (fil principal en vert, bout libre en orange). Fais chaque nœud à la maison et tire fort dessus avant d\'aller sur l\'eau. Mouille toujours le nœud avant de serrer.</p></div>');
+    '<p class="small muted" style="margin:10px 2px;">Ouvre un nœud : les étapes sont écrites, avec un schéma pour les nœuds les plus courants (fil principal en bleu, bout libre en orange) et un bouton vidéo. Fais chaque nœud à la maison et tire fort dessus avant d\'aller sur l\'eau. Mouille toujours le nœud avant de serrer.</p></div>');
 }
 function openKnot(id) {
   var k = null; for (var i = 0; i < KNOTS.length; i++) if (KNOTS[i].id === id) k = KNOTS[i];
@@ -258,9 +261,13 @@ function openKnot(id) {
   openSheet("<h2>" + esc(k.n) + "</h2>" +
     '<p class="small muted" style="margin:0 0 6px;">' + esc(k.t) + "</p>" +
     '<p class="small"><span class="badge">' + esc(knotLabelList(k.m, KNOT_METHODS)) + '</span> <span class="badge">' + esc(knotLabelList(k.l, KNOT_LINES)) + "</span></p>" +
-    '<div class="ksteps">' + k.s.map(function (x, i) { return '<div class="kstep"><div class="knum">' + (i + 1) + '</div><div class="kbody"><div class="kd-fig"><img src="assets/knots/' + k.id + "-" + (i + 1) + '.jpg" alt="Photo de vraie corde, étape ' + (i + 1) + '" loading="lazy" /></div><p>' + esc(x) + "</p></div></div>"; }).join("") + "</div>" +
+    '<div class="ksteps">' + k.s.map(function (x, i) { return '<div class="kstep"><div class="knum">' + (i + 1) + '</div><div class="kbody">' + (KNOT_FIGS.indexOf(k.id) >= 0 ? '<div class="kd-fig"><img src="assets/knots/' + k.id + "-" + (i + 1) + '.svg" alt="Schéma, étape ' + (i + 1) + '" loading="lazy" /></div>' : "") + "<p>" + esc(x) + "</p></div></div>"; }).join("") + "</div>" +
     (k.w ? '<p class="small" style="margin:10px 0 0;"><b>À savoir :</b> ' + esc(k.w) + "</p>" : "") +
+    '<a class="btn btn-ghost" style="margin-top:10px;text-decoration:none;" target="_blank" rel="noopener" href="' + knotVideoUrl(k) + '">▶ Regarder une vidéo (internet requis)</a>' +
     '<div style="height:12px"></div><button class="btn" onclick="closeSheet()">Fermer</button>');
+}
+function knotVideoUrl(k) {
+  return "https://www.youtube.com/results?search_query=" + encodeURIComponent("comment faire nœud " + k.n.replace(/\s*\(.*\)\s*/, " ") + " pêche");
 }
 function openKnotRigs() {
   var names = { mouche: "Pêche à la mouche", leger: "Lancer léger", lourd: "Lancer lourd" }, html = "";

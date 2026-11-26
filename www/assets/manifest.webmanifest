@@ -1,7 +1,7 @@
 {
-  "name": "Appli de pêche",
-  "short_name": "Pêche",
-  "description": "Appli de pêche autonome : leurres, prises, albums, carte des plans d'eau du Québec, règlements — données sauvegardées sur le téléphone.",
+  "name": "Carnet de pêche Québec",
+  "short_name": "Carnet",
+  "description": "Carnet de pêche Québec : leurres, prises, albums, carte des plans d'eau du Québec, règlements — données sauvegardées sur le téléphone.",
   "lang": "fr-CA",
   "dir": "ltr",
   "id": "./",
