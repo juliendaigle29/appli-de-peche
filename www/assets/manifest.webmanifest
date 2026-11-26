@@ -1,0 +1,38 @@
+{
+  "name": "Appli de pêche",
+  "short_name": "Pêche",
+  "description": "Appli de pêche autonome : leurres, prises, albums, carte des plans d'eau du Québec, règlements — données sauvegardées sur le téléphone.",
+  "lang": "fr-CA",
+  "dir": "ltr",
+  "id": "./",
+  "start_url": "index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0c4a42",
+  "theme_color": "#0c4a42",
+  "categories": [
+    "sports",
+    "utilities"
+  ],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+Polices embarquées dans l'appli (hors ligne), sous licence SIL Open Font License 1.1 (https://openfontlicense.org) :
+- Bitter — Copyright The Bitter Project Authors (Sol Matas)
+- DM Sans — Copyright The DM Sans Project Authors (Colophon Foundry, Google)
+Ces fichiers sont des versions réduites (caractères latins) des polices d'origine.

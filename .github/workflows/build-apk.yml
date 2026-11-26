@@ -1,0 +1,53 @@
+# Compile l'APK de l'Appli de pêche, sans rien installer sur l'ordinateur.
+# Comment ça marche : on dépose le projet sur GitHub, GitHub compile tout seul,
+# et l'APK apparaît en téléchargement dans l'onglet Actions.
+name: Construire l'APK
+
+on:
+  workflow_dispatch: # bouton "Run workflow" dans l'onglet Actions
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Capacitor 8 exige Java 21 (voir android/app/capacitor.build.gradle)
+      - name: Installer Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Installer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # Le projet Android a besoin de la bibliothèque Capacitor (node_modules)
+      - name: Installer Capacitor
+        run: npm install --ignore-scripts
+
+      - name: Synchroniser le projet Android (www -> android)
+        run: npx cap sync android
+
+      - name: Installer le SDK Android (API 36)
+        uses: android-actions/setup-android@v3
+
+      - name: Installer les outils de compilation 36.0.0
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Compiler l'APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Récupérer l'APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Appli-de-peche
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
