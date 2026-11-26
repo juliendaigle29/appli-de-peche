@@ -35,11 +35,13 @@ jobs:
       - name: Synchroniser le projet Android (www -> android)
         run: npx cap sync android
 
+      # Le coureur Ubuntu de GitHub a déjà un SDK Android préinstallé :
+      # on utilise sdkmanager directement au lieu de l'action setup-android.
       - name: Installer le SDK Android (API 36)
-        uses: android-actions/setup-android@v3
-
-      - name: Installer les outils de compilation 36.0.0
-        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          yes | sdkmanager --licenses || true
+          sdkmanager "platforms;android-36" "build-tools;36.0.0"
 
       - name: Compiler l'APK
         working-directory: android
