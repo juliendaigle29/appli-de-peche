@@ -298,7 +298,7 @@
               </div>
             </div>
           </div>
-          <p class="small muted" style="margin:10px 2px 0;">Version 14 · 19 195 plans d'eau, 35 nœuds, accueil par zone, point vert/rouge.</p>
+          <p class="small muted" style="margin:10px 2px 0;">Version 15 · 19 195 plans d'eau, 46 nœuds, leurres Malades de pêche, détection internet.</p>
         </details>
       </div>
     </section>
@@ -352,17 +352,17 @@
         <div class="guide-list">
           <button class="guide-card" onclick="openKnots()">
             <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 3v6"/><circle cx="9" cy="12" r="3"/><path d="M9 15c0 3-4 3-4 6M15 3c0 5 3 6 3 9a3.5 3.5 0 0 1-7 0"/></svg></span>
-            <span style="flex:1;min-width:0;"><b>Nœuds de pêche</b><span id="guidesKnotCount">Nœuds étape par étape, avec schémas de corde</span><span>Mouche, lancer léger, lancer lourd</span></span>
+            <span style="flex:1;min-width:0;"><b>Nœuds de pêche</b></span>
             <span class="chev">›</span>
           </button>
           <button class="guide-card" onclick="openConso()">
             <span class="ic acc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 12c3-4.5 7-7 12-7-1 2-1.5 4-1.5 6s.5 4 1.5 6c-5 0-9-2.5-12-5z"/><path d="M6 12l-3 3m3-3l-3-3"/></svg></span>
-            <span style="flex:1;min-width:0;"><b>Manger le poisson</b><span>Limites du Québec : repas par mois par espèce, et ton compteur du mois</span></span>
+            <span style="flex:1;min-width:0;"><b>Manger le poisson</b></span>
             <span class="chev">›</span>
           </button>
           <button class="guide-card" onclick="openBoatView()">
             <span class="ic alt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15l1.5 5h13L20 15"/><path d="M2 15h20"/><path d="M12 15V6"/><path d="M12 6l5 5h-5"/></svg></span>
-            <span style="flex:1;min-width:0;"><b>Permis de bateau</b><span id="guidesBoatStatus">Photo de ta carte de conducteur, toujours sur toi</span></span>
+            <span style="flex:1;min-width:0;"><b>Permis de bateau</b></span>
             <span class="chev">›</span>
           </button>
         </div>
@@ -1553,7 +1553,14 @@
         { n:"Gibbs Koho", b:"Gibbs", t:"Cuillère", s:["1/4 oz","1/2 oz","3/4 oz"] },
         { n:"Berkley Flicker Shad", b:"Berkley", t:"Poisson-nageur", s:["5 cm","7 cm","9 cm"] },
         { n:"Storm Wildeye Swim Shad", b:"Storm", t:"Leurre souple", s:["7,5 cm","10 cm","12,5 cm","15 cm"] },
-        { n:"Berkley PowerBait Power Grub", b:"Berkley", t:"Leurre souple", s:["5 cm","7,5 cm","10 cm"] }
+        { n:"Berkley PowerBait Power Grub", b:"Berkley", t:"Leurre souple", s:["5 cm","7,5 cm","10 cm"] },
+        { n:"M.Punch", b:"Malades de pêche", t:"Poisson-nageur", s:["2 3/8 po"] },
+        { n:"Hellgramite", b:"Malades de pêche", t:"Leurre souple", s:["2 po"] },
+        { n:"Nymphe", b:"Malades de pêche", t:"Leurre souple", s:["1 1/2 po"] },
+        { n:"Méné Mme Wally Curly Tail", b:"Malades de pêche", t:"Poisson-nageur", s:["3 1/2 po"] },
+        { n:"Fat Wally Ripple", b:"Malades de pêche", t:"Leurre souple", s:["3 1/2 po"] },
+        { n:"Méné M. Flash", b:"Malades de pêche", t:"Leurre souple", s:["3 po"] },
+        { n:"M Flash V-Tail", b:"Malades de pêche", t:"Leurre souple", s:["3 1/2 po"] }
       ];
       // Seuil de ressemblance pour proposer un leurre déjà connu (0..1).
       // Calibré sur des images synthétiques (tests v13) : deux photos
@@ -1562,21 +1569,24 @@
       // toujours à confirmer, le seuil ne garantit rien à lui seul.
       const LURE_MATCH_MIN = 0.82;
       function lureCatalogFind(text){
-        const q = norm(text); if(!q) return null;
-        return LURE_CATALOG.find(m => norm(m.n) === q || norm(m.b + " " + m.n) === q) || null;
+        const q = normKey(text); if(!q) return null;
+        return LURE_CATALOG.find(m => normKey(m.n) === q || normKey(m.b + " " + m.n) === q) || null;
       }
       function lureCatalogSearch(text, limit){
-        const q = norm(text); if(q.length < 2) return [];
-        return LURE_CATALOG.filter(m => norm(m.n).includes(q) || norm(m.b).includes(q) || norm(m.n + " " + m.b).includes(q)).slice(0, limit || 4);
+        const q = normKey(text); if(q.length < 2) return [];
+        return LURE_CATALOG.filter(m => normKey(m.n).includes(q) || normKey(m.b).includes(q) || normKey(m.n + " " + m.b).includes(q)).slice(0, limit || 4);
       }
+      // Comparaison des noms de leurres sans ponctuation : « M Punch »,
+      // « M.Punch » et « MPunch » trouvent tous le M.Punch.
+      function normKey(s){ return norm(s).replace(/[^a-z0-9]/g, ""); }
       // Suggestions de noms pendant la frappe : modèles du catalogue + leurres
       // déjà dans la boîte. Tout est modifiable après : on ne fait que remplir.
       function renderLureNameSugg(){
         const box = $("#lfNameSugg"); if(!box) return;
         const q = $("#lfName").value.trim();
         const fromCat = lureCatalogSearch(q, 4);
-        const qn = norm(q);
-        const fromBox = qn.length >= 2 ? DB.lures.filter(l => norm(l.name).includes(qn)).slice(0, 3) : [];
+        const qn = normKey(q);
+        const fromBox = qn.length >= 2 ? DB.lures.filter(l => normKey(l.name).includes(qn)).slice(0, 3) : [];
         const parts = [];
         fromCat.forEach((m, i) => parts.push(`<button type="button" class="chip" onclick="pickLureModel(${i})">${esc(m.n)} <span class="muted">· ${esc(m.t)}</span></button>`));
         fromBox.forEach(l => parts.push(`<button type="button" class="chip" onclick="pickLureFromBox('${l.id}')">${esc(l.name)}${l.sizeLabel ? " · " + esc(l.sizeLabel) : ""} <span class="muted">· déjà dans ta boîte</span></button>`));
@@ -1683,8 +1693,24 @@
           const l = m.lure;
           box2.innerHTML = `<div class="id-box"><b>🔍 Ça ressemble à ton leurre « ${esc(l.name)} »${l.sizeLabel ? " · " + esc(l.sizeLabel) : ""}</b><br/><span class="small">C'est une proposition — vérifie avant de confirmer. Tu l'as déjà dans ta boîte (Qté : ${l.qty}).</span><div class="btn-row"><button type="button" class="btn btn-accent btn-sm" onclick="confirmLureMatch('${l.id}')">Oui, c'est lui</button><button type="button" class="btn btn-ghost btn-sm" onclick="dismissLureMatch()">Non, c'est un autre</button></div></div>`;
         } else {
-          box2.innerHTML = `<div class="id-box"><b>❓ Leurre non reconnu</b><br/><span class="small">Ajoute son nom et sa grandeur ci-dessous — il sera enregistré avec sa photo, et la prochaine fois que tu le photographieras, l'appli te le proposera.</span></div>`;
+          box2.innerHTML = `<div class="id-box"><b>❓ Leurre non reconnu</b><br/><span class="small">Ajoute son nom et sa grandeur ci-dessous — il sera enregistré avec sa photo, et la prochaine fois que tu le photographieras, l'appli te le proposera.</span><div class="btn-row" style="margin-top:8px"><button type="button" class="btn btn-accent btn-sm" onclick="openLureWebDetect()">🔍 Détection automatique (internet requis)</button></div><span class="small muted">À faire à la maison, pas sur l'eau : la photo est envoyée en ligne pour être reconnue. Choisis la même photo dans Google Lens, note le modèle trouvé, puis reviens ici et tape son nom — l'appli te proposera sa grandeur.</span></div>`;
         }
+      }
+      // Détection automatique d'un leurre par photo, sur internet : ouvre
+      // Google Lens dans le navigateur. À faire à la maison, avec réseau —
+      // pas sur l'eau. La photo est envoyée en ligne pour être reconnue.
+      function openLureWebDetect(){
+        const box = $("#lfIdBox"); if(!box) return;
+        if(!navigator.onLine){
+          box.innerHTML = `<div class="id-box"><b>📶 Pas de réseau pour l'instant</b><br/><span class="small">La détection automatique demande internet — réessaie à la maison, avec le Wi-Fi.</span></div>`;
+          return;
+        }
+        const url = "https://lens.google.com/";
+        try{
+          const BR = window.Capacitor && Capacitor.Plugins && Capacitor.Plugins.Browser;
+          if(BR && BR.open){ BR.open({ url }); return; }
+        }catch(e){}
+        window.open(url, "_blank");
       }
       function confirmLureMatch(id){
         const l = lureById(id); if(!l) return;
@@ -1697,7 +1723,7 @@
       }
       function dismissLureMatch(){
         const box = $("#lfIdBox");
-        if(box) box.innerHTML = `<div class="id-box"><b>❓ Leurre non reconnu</b><br/><span class="small">Ajoute son nom et sa grandeur ci-dessous — il sera enregistré avec sa photo, et la prochaine fois que tu le photographieras, l'appli te le proposera.</span></div>`;
+        if(box) box.innerHTML = `<div class="id-box"><b>❓ Leurre non reconnu</b><br/><span class="small">Ajoute son nom et sa grandeur ci-dessous — il sera enregistré avec sa photo, et la prochaine fois que tu le photographieras, l'appli te le proposera.</span><div class="btn-row" style="margin-top:8px"><button type="button" class="btn btn-accent btn-sm" onclick="openLureWebDetect()">🔍 Détection automatique (internet requis)</button></div><span class="small muted">À faire à la maison, pas sur l'eau : la photo est envoyée en ligne pour être reconnue. Choisis la même photo dans Google Lens, note le modèle trouvé, puis reviens ici et tape son nom — l'appli te proposera sa grandeur.</span></div>`;
       }
       // Empreintes manquantes des leurres déjà dans la boîte (photos d'avant
       // cette version) : calculées une fois, en arrière-plan, sans bloquer.
@@ -2646,7 +2672,7 @@
       // desinscrit les service workers, puis recharge la page une seule
       // fois. Les donnees enregistrees (prises, leurres, reglages) ne
       // sont pas touchees.
-      var APP_VERSION = 14;
+      var APP_VERSION = 15;
       (function () {
         try {
           fetch("assets/version.json?t=" + Date.now(), { cache: "no-store" })
