@@ -5,7 +5,7 @@
    se rafraîchissent toutes seules quand le réseau est disponible. */
 "use strict";
 
-var CACHE_VERSION = "peche-v11";
+var CACHE_VERSION = "peche-v12";
 var SHELL_CACHE = CACHE_VERSION + "-shell";
 var RUNTIME_CACHE = CACHE_VERSION + "-runtime";
 
@@ -184,6 +184,14 @@ self.addEventListener("fetch", function (event) {
   /* Tuiles de carte : cache d'abord, rafraîchies en arrière-plan quand elles vieillissent. */
   if (isTileHost(url.hostname)) {
     event.respondWith(handleTile(event));
+    return;
+  }
+
+  /* Sonde de connectivité (indicateur « En ligne » de l'appli) : réseau
+     seulement, jamais servie par le cache, sinon la sonde dirait
+     « en ligne » même hors ligne. */
+  if (url.searchParams.has("__probe")) {
+    event.respondWith(fetch(req).catch(function () { return new Response("", { status: 504 }); }));
     return;
   }
 
