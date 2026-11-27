@@ -5,7 +5,7 @@
    se rafraîchissent toutes seules quand le réseau est disponible. */
 "use strict";
 
-var CACHE_VERSION = "peche-v18";
+var CACHE_VERSION = "peche-v19";
 var SHELL_CACHE = CACHE_VERSION + "-shell";
 var RUNTIME_CACHE = CACHE_VERSION + "-runtime";
 
