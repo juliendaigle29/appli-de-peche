@@ -298,7 +298,7 @@
               </div>
             </div>
           </div>
-          <p class="small muted" style="margin:10px 2px 0;">Version 15 · 34 905 plans d'eau, 46 nœuds, leurres Malades de pêche, détection locale (OCR emballage + photo).</p>
+          <p class="small muted" style="margin:10px 2px 0;">Version 16 · 34 905 plans d'eau, 46 nœuds, routes sur la carte, guide épuré.</p>
         </details>
       </div>
     </section>
@@ -319,6 +319,7 @@
         <div class="btn-row" style="margin-top:12px;">
           <button class="btn btn-ghost" id="listToggle" onclick="toggleSpotList()">Voir la liste des plans d'eau</button>
           <button class="btn btn-ghost" id="locateBtn" onclick="locateMe()">📍 Ma position</button>
+          <button class="btn btn-ghost" id="roadsBtn" onclick="toggleRoads()">🛣 Routes affichées</button>
         </div>
         <div id="spotList" style="display:none;"></div>
         <div id="searchResults"></div>
@@ -365,10 +366,6 @@
             <span style="flex:1;min-width:0;"><b>Permis de bateau</b></span>
             <span class="chev">›</span>
           </button>
-        </div>
-        <div class="card">
-          <h3>Le bon réflexe</h3>
-          <p class="small" style="margin:4px 0 0;">Fais chaque nœud à la maison et tire fort dessus avant d'aller sur l'eau. Mouille toujours le nœud avant de le serrer : ça le rend plus solide et ça évite de brûler le fil.</p>
         </div>
       </div>
     </section>
@@ -2397,13 +2394,17 @@
       }
 
       // ==================== carte ====================
-      let map = null, spotLayer = null;
+      let map = null, spotLayer = null, roadsLayer = null, roadsOn = true;
       let userMarker = null, userAccuracy = null, userWatchId = null, userTracking = false;
       function initMap(){
         if(typeof L === "undefined"){ $("#searchMsg").textContent = "La carte a besoin d'une connexion pour charger (tuiles satellite). La liste des plans d'eau reste disponible hors ligne."; renderSpotList(); $("#spotList").style.display = "block"; return; }
         if(!map){
           map = L.map("map", { zoomControl: true }).setView([45.4, -71.9], 11);
           L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { attribution: "Imagerie : Esri, Maxar, Earthstar Geographics", maxZoom: 18 }).addTo(map);
+          // Routes et noms de lieux par-dessus le satellite (couche de
+          // référence Esri, transparente, même hôte que l'imagerie : ses
+          // tuiles sont gardées hors ligne comme les autres).
+          roadsLayer = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}", { attribution: "Routes et noms : Esri", maxZoom: 18 }).addTo(map);
           spotLayer = L.layerGroup().addTo(map);
           extraLayer = L.layerGroup().addTo(map);
           map.on("zoomend", () => { const el = document.getElementById("map"); if(el) el.classList.toggle("labels-off", map.getZoom() < 10); updateDotSize(); drawMarkers(); });
@@ -2423,7 +2424,7 @@
         centerMapOnUser();
       }
       // Marqueurs des plans d'eau : seuls ceux visibles à l'écran sont dans
-      // le DOM (le catalogue compte 15 000+ plans d'eau). Les
+      // le DOM (le catalogue compte 34 905 plans d'eau). Les
       // marqueurs sortis de l'écran sont retirés de la carte mais gardés en
       // réserve et réutilisés tels quels quand on revient dessus. Aux petits
       // zooms, on n'affiche qu'un point par case de grille (1° sous le zoom 7,
@@ -2533,6 +2534,15 @@
       function updateLocateBtn(){
         const b = document.getElementById("locateBtn");
         if(b) b.textContent = userTracking ? "📍 Suivi actif — arrêter" : "📍 Ma position";
+      }
+      // Routes par-dessus le satellite : affichées par défaut, masquables
+      // d'un tap (le bouton change de libellé comme celui de la position).
+      function toggleRoads(){
+        if(!map || !roadsLayer) return;
+        roadsOn = !roadsOn;
+        if(roadsOn) roadsLayer.addTo(map); else map.removeLayer(roadsLayer);
+        const b = document.getElementById("roadsBtn");
+        if(b) b.textContent = roadsOn ? "🛣 Routes affichées" : "🛣 Routes masquées";
       }
       function mapMarkCatch(lat, lng){
         if(map) map.closePopup();
@@ -3005,7 +3015,7 @@
       // desinscrit les service workers, puis recharge la page une seule
       // fois. Les donnees enregistrees (prises, leurres, reglages) ne
       // sont pas touchees.
-      var APP_VERSION = 15;
+      var APP_VERSION = 16;
       (function () {
         try {
           fetch("assets/version.json?t=" + Date.now(), { cache: "no-store" })
