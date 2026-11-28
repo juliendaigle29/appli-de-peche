@@ -131,6 +131,11 @@
       .spot-divicon{background:none;border:none;width:14px;height:14px;display:flex;align-items:center;justify-content:center;}
       .spot-divicon .spot-dot{display:block;width:var(--dot);height:var(--dot);border-radius:50%;background:#e86a17;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.5);}
       #searchResults, #spotList{padding-bottom:160px;}
+      /* ---------- page carte : tout tient dans l'écran, pas de défilement (v22) ---------- */
+      #view-map.active{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden;}
+      #view-map.active #map{flex:1 1 auto;min-height:120px;height:auto;}
+      #view-map.active .wrap{flex:0 1 auto;min-height:0;display:flex;flex-direction:column;}
+      #view-map.active #spotList,#view-map.active #searchResults{flex:1 1 auto;min-height:0;overflow-y:auto;padding-bottom:12px;}
       .map-tools{padding:8px 12px 0;max-width:860px;margin:0 auto;}
       .searchbar{display:flex;gap:8px;}
       .searchbar input{flex:1;min-height:44px;border:1.5px solid var(--line);border-radius:12px;padding:8px 12px;background:var(--card);}
@@ -806,15 +811,60 @@
       document.addEventListener("visibilitychange", function(){ if(document.visibilityState === "visible") probeOnline(); });
       setInterval(function(){ if(document.visibilityState === "visible") probeOnline(); }, 60000);
       function openTripSheet(){
-        const recent = CATALOG.slice(0,0);
         openSheet(`<h2>Je pars pêcher</h2>
           <p class="muted small">Choisis ton plan d'eau — ou pars sans le préciser, tu l'ajouteras sur tes prises.</p>
           <label class="flabel" for="tripSpot">Plan d'eau</label>
-          <input class="finput" id="tripSpot" list="spotNames" placeholder="Ex. : Lac Memphrémagog" autocomplete="off" />
-          <datalist id="spotNames">${CATALOG.map(s=>`<option value="${esc(s.n)}">`).join("")}${DB.coins.map(c=>`<option value="${esc(c.name)}">`).join("")}</datalist>
+          <input class="finput" id="tripSpot" placeholder="Ex. : Lac Memphrémagog" autocomplete="off" oninput="renderTripSpotList()" />
+          <div id="tripSpotList" style="margin-top:8px"></div>
           <div style="height:16px"></div>
           <button class="btn btn-accent" onclick="startTrip()">Partir !</button>`);
       }
+      let tripNormCache = null;
+      // Recherche dans TOUT le catalogue (63 689 plans d'eau) : le datalist
+      // natif n'affiche qu'une partie des suggestions quand il y en a trop.
+      function tripSearch(q, limit){
+        const nq = norm(q || "").trim();
+        if(nq.length < 2) return { hits: [], total: 0 };
+        if(!tripNormCache) tripNormCache = CATALOG.map(s => norm((s.n||"") + " " + (s.l||"")));
+        const hits = []; let total = 0;
+        for(let i=0; i<CATALOG.length; i++){
+          if(tripNormCache[i].indexOf(nq) >= 0){ total++; if(hits.length < limit) hits.push(i); }
+        }
+        return { hits, total };
+      }
+      function renderTripSpotList(){
+        const box = $("tripSpotList"); if(!box) return;
+        const q = $("tripSpot").value || "";
+        const nq = norm(q).trim();
+        if(nq.length < 2){ box.innerHTML = `<p class="small muted">Tape au moins 2 lettres — la recherche couvre les ${CATALOG.length} plans d'eau.</p>`; return; }
+        const r = tripSearch(q, 30);
+        const coinIdx = [];
+        DB.coins.forEach((c,ci)=>{ if(norm(c.name||"").indexOf(nq) >= 0) coinIdx.push(ci); });
+        box.innerHTML = (r.total || coinIdx.length)
+          ? (r.total ? `<p class="small muted">${r.total} plan(s) d'eau — ${Math.min(r.total, 30)} premier(s) affiché(s).</p>` : "")
+            + r.hits.map(i => { const s = CATALOG[i]; return `<button class="item" onclick="pickTripSpot(${i})"><span class="grow"><span class="t">${esc(s.n)}</span><br/><span class="small muted">${esc(s.l||"")} · ${esc(s.r||"")}</span></span><span style="font-size:20px;color:var(--muted);">›</span></button>`; }).join("")
+            + coinIdx.map(ci => { const c = DB.coins[ci]; return `<button class="item" onclick="pickTripCoin(${ci})"><span class="grow"><span class="t">📌 ${esc(c.name)}</span><br/><span class="small muted">Mon coin</span></span></button>`; }).join("")
+          : `<div class="empty">Aucun plan d'eau ne correspond. Essaie un autre nom.</div>`;
+      }
+      function pickTripSpot(i){ $("tripSpot").value = CATALOG[i].n; $("tripSpotList").innerHTML = ""; }
+      function pickTripCoin(ci){ $("tripSpot").value = DB.coins[ci].name; $("tripSpotList").innerHTML = ""; }
+      // Même recherche pour le formulaire de prise (réutilise tripSearch).
+      function renderCfSpotList(){
+        const box = $("cfSpotList"); if(!box) return;
+        const q = $("cfSpot").value || "";
+        const nq = norm(q).trim();
+        if(nq.length < 2){ box.innerHTML = `<p class="small muted">Tape au moins 2 lettres — la recherche couvre les ${CATALOG.length} plans d'eau.</p>`; return; }
+        const r = tripSearch(q, 30);
+        const coinIdx = [];
+        DB.coins.forEach((c,ci)=>{ if(norm(c.name||"").indexOf(nq) >= 0) coinIdx.push(ci); });
+        box.innerHTML = (r.total || coinIdx.length)
+          ? (r.total ? `<p class="small muted">${r.total} plan(s) d'eau — ${Math.min(r.total, 30)} premier(s) affiché(s).</p>` : "")
+            + r.hits.map(i => { const s = CATALOG[i]; return `<button class="item" onclick="pickCfSpot(${i})"><span class="grow"><span class="t">${esc(s.n)}</span><br/><span class="small muted">${esc(s.l||"")} · ${esc(s.r||"")}</span></span><span style="font-size:20px;color:var(--muted);">›</span></button>`; }).join("")
+            + coinIdx.map(ci => { const c = DB.coins[ci]; return `<button class="item" onclick="pickCfCoin(${ci})"><span class="grow"><span class="t">📌 ${esc(c.name)}</span><br/><span class="small muted">Mon coin</span></span></button>`; }).join("")
+          : `<div class="empty">Aucun plan d'eau ne correspond. Essaie un autre nom.</div>`;
+      }
+      function pickCfSpot(i){ const v = CATALOG[i].n; $("cfSpot").value = v; catchForm.spotName = v; refreshSpeciesChips(); $("cfSpotList").innerHTML = ""; }
+      function pickCfCoin(ci){ const v = DB.coins[ci].name; $("cfSpot").value = v; catchForm.spotName = v; refreshSpeciesChips(); $("cfSpotList").innerHTML = ""; }
       function startTrip(){
         const name = ($("#tripSpot").value||"").trim();
         DB.trips.forEach(t=>{ if(!t.endedAt) t.endedAt = Date.now(); });
@@ -1128,8 +1178,8 @@
           <label class="flabel" for="cfSpecies">Espèce</label>
           <input class="finput" id="cfSpecies" value="${esc(catchForm.species)}" placeholder="Ex. : Doré jaune" autocomplete="off" />
           <label class="flabel" for="cfSpot">Plan d'eau</label>
-          <input class="finput" id="cfSpot" list="spotNames2" value="${esc(defaultSpot)}" placeholder="Où l'as-tu pêché ?" autocomplete="off" onchange="catchForm.spotName=this.value;refreshSpeciesChips()" />
-          <datalist id="spotNames2">${CATALOG.map(s=>`<option value="${esc(s.n)}">`).join("")}${DB.coins.map(c=>`<option value="${esc(c.name)}">`).join("")}</datalist>
+          <input class="finput" id="cfSpot" value="${esc(defaultSpot)}" placeholder="Où l'as-tu pêché ?" autocomplete="off" oninput="renderCfSpotList()" onchange="catchForm.spotName=this.value;refreshSpeciesChips()" />
+          <div id="cfSpotList" style="margin-top:8px"></div>
           <label class="flabel">Grandeur (facultative)</label>
           <div class="seg" id="cfSizeMode">
             <button type="button" data-m="plus-tard" class="on">Plus tard</button>
@@ -2843,7 +2893,7 @@
           // Légende de la carte (v21) : explique TOUTES les couleurs de
           // points — plans d'eau, mises à l'eau par accès, coins, prises,
           // position. Repliée par défaut (bouton « Légende »), un tap l'ouvre.
-          const legend = L.control({ position: "bottomleft" });
+          const legend = L.control({ position: "topright" });
           legend.onAdd = function(){
             const div = L.DomUtil.create("div", "map-legend");
             div.innerHTML =
@@ -2876,6 +2926,7 @@
           });
         }
         setTimeout(()=>{ try{ map.invalidateSize(); }catch(e){} }, 80);
+        if(window.ResizeObserver && !map._ro){ map._ro = new ResizeObserver(()=>{ try{ map.invalidateSize(); }catch(e){} }); map._ro.observe(document.getElementById("map")); }
         updateDotSize();
         updateLaunchSize();
         drawMarkers();
@@ -3571,7 +3622,7 @@
       // desinscrit les service workers, puis recharge la page une seule
       // fois. Les donnees enregistrees (prises, leurres, reglages) ne
       // sont pas touchees.
-      var APP_VERSION = 19;
+      var APP_VERSION = 20;
       (function () {
         try {
           fetch("assets/version.json?t=" + Date.now(), { cache: "no-store" })
